@@ -6,5 +6,7 @@ uint32_t get_version() {
 }
 
 uint32_t get_build() {
-    return PROJECT_BUILD_NUMBER;
+    //return PROJECT_BUILD_NUMBER;
+    return 0;
 }
+

@@ -1,4 +1,5 @@
 #define BOOST_TEST_MODULE boost_test_version
+#define BOOST_TEST_MAIN
 
 #include "mylib.h"
 

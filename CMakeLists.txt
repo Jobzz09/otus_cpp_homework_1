@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 set (CMAKE_CXX_STANDARD 20)
+
+
+
 set(PROJECT_MAJOR_VERSION 1 CACHE INTERNAL "Major version")
 set(PROJECT_MINOR_VERSION 0 CACHE INTERNAL "Minor version")
 set(PROJECT_PATCH_VERSION 28 CACHE INTERNAL "Patch version")
@@ -34,7 +37,6 @@ add_executable(${PROJECT_NAME} ${TARGET_SRC} "${PROJECT_BINARY_DIR}/build_info.h
 
 add_dependencies(${PROJECT_NAME} generate_build_number)
 
-
 add_subdirectory(lib/mylib)
 
 configure_file(version.h.in include/version.h)
@@ -56,16 +58,49 @@ target_link_libraries(${PROJECT_NAME}
 PRIVATE mylib)
 
 if (WITH_BOOST_TEST)
-    find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-        
-    add_executable(boost_test_version ${TEST_SRC})
+    set (BOOST_COMPONENTS
+    thread 
+    filesystem
+    unit_test_framework)
 
-    set_target_properties(boost_test_version PROPERTIES
-        INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
+    set (Boost_USE_STATIC_LIBS ON)
 
+    set (Boost_USE_MULTITHREADED ON)
+
+    include_directories(${Boost_INCLUDE_DIRS})
+
+    find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+    
+    add_definitions(-DBOOST_TEST_STATIC_LINK)
+
+    add_executable(boost_test_version 
+        "./test/boost_test_version.cpp"
+        )
+    
     target_link_libraries(boost_test_version
-        ${BOOST_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT} 
+        ${Boost_LIBRARIES}
         mylib)
+
+        
+
+        add_test(boost_test_version boost_test_version)
+
+        add_executable(boost_test_build
+        "./test/boost_test_build.cpp"
+        "${PROJECT_BINARY_DIR}/build_info.hpp")
+
+        target_link_libraries(boost_test_build
+        ${CMAKE_THREAD_LIBS_INIT} 
+        ${Boost_LIBRARIES})
+
+        target_include_directories(boost_test_build
+        PUBLIC "${PROJECT_BINARY_DIR}")
+
+        add_test(boost_test_build boost_test_build)
+
+        enable_testing()
+        
    
 endif()
 
@@ -98,8 +133,4 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_CONTACT jobzz.off@gmail.com)
 include(CPack)
 
-if(WITH_BOOST_TEST)
-    enable_testing()
-    add_test(boost_test_version boost_test_version)
-endif()
 

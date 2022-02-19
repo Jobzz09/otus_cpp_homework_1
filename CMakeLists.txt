@@ -18,18 +18,18 @@ project(helloworld VERSION ${PROJECT_VERSION})
 add_custom_target(generate_build_number
     COMMAND ${CMAKE_COMMAND}
             -D
-    "BUILD_NUMBER_FILE=${PROJECT_BINARY_DIR}/build_number.txt"
+    "BUILD_NUMBER_FILE=${CMAKE_SOURCE_DIR}/build_number.txt"
     -P "${CMAKE_SOURCE_DIR}/generate-build-number.cmake"
-    BYPRODUCTS "${PROJECT_BINARY_DIR}/build_number.txt"
+    BYPRODUCTS "${CMAKE_SOURCE_DIR}/build_number.txt"
     )
 
 add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/build_info.hpp"
     COMMAND ${CMAKE_COMMAND}
-    -D"BUILD_NUMBER_FILE=${PROJECT_BINARY_DIR}/build_number.txt"
+    -D"BUILD_NUMBER_FILE=${CMAKE_SOURCE_DIR}/build_number.txt"
     -D"CPP_FILE=${PROJECT_BINARY_DIR}/build_number.hpp"
     -P "${CMAKE_SOURCE_DIR}/generate-build-info-cpp.cmake"
-    DEPENDS "${PROJECT_BINARY_DIR}/build_number.txt"
+    DEPENDS "${CMAKE_SOURCE_DIR}/build_number.txt"
 )
 
 add_executable(${PROJECT_NAME} ${TARGET_SRC} "${PROJECT_BINARY_DIR}/build_info.hpp")

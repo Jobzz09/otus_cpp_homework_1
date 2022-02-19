@@ -22,20 +22,13 @@ jobs:
     
     - name: Install gtest manually
       run: |
-        sudo apt-get install libgtest-dev
-        cd /usr/src/gtest
-        sudo cmake CMakeLists.txt
-        sudo make
-        sudo cp ./*.a /usr/lib
-        sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
-        sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
-        sudo apt-get install libgtest-dev
-        cd /usr/src/gtest
-        sudo cmake CMakeLists.txt
-        sudo make
-        sudo cp ./*.a /usr/lib
-        sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
-        sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
+        mkdir gtest && cd gtest
+        git clone https://github.com/google/googletest/
+        cd googletest
+        cmake -S . -B build/
+        cd build
+        cmake --build .
+        sudo make install
 
     - name: Configure CMake
       run: ./configure_with_gtest.sh

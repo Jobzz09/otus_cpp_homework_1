@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.5.0)
 
 set (CMAKE_CXX_STANDARD 20)
 
-
-
 set(PROJECT_MAJOR_VERSION 1 CACHE INTERNAL "Major version")
 set(PROJECT_MINOR_VERSION 0 CACHE INTERNAL "Minor version")
 set(PROJECT_PATCH_VERSION 28 CACHE INTERNAL "Patch version")
@@ -12,7 +10,8 @@ set(PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_
 file(GLOB TARGET_SRC "./src/*.cpp" )
 file(GLOB TEST_SRC "./test/*.cpp")
 
-option(WITH_BOOST_TEST "Whether to build Boost test" ON)
+option(WITH_BOOST_TEST "Whether to build Boost test" OFF)
+option(WITH_GOOGLE_TEST "Whether to build gtest" OFF)
 
 project(helloworld VERSION ${PROJECT_VERSION})
 
@@ -82,8 +81,6 @@ if (WITH_BOOST_TEST)
         ${Boost_LIBRARIES}
         mylib)
 
-        
-
         add_test(boost_test_version boost_test_version)
 
         add_executable(boost_test_build
@@ -102,6 +99,36 @@ if (WITH_BOOST_TEST)
         enable_testing()
         
    
+endif()
+
+if (WITH_GOOGLE_TEST)
+    find_package(PkgConfig)
+    
+    pkg_check_modules(GTEST REQUIRED gtest>=1.5.0)
+    
+    include_directories(
+        ${GTEST_INCLUDE_DIRS}
+    )
+
+    add_executable(google_test_version "./test/google_test_version.cpp" "./test/main.cpp")
+    add_executable(google_test_build "./test/google_test_build.cpp" "./test/main.cpp" "${PROJECT_BINARY_DIR}/build_info.hpp")
+    
+    target_link_libraries(google_test_version
+    PRIVATE ${GTEST_LIBRARIES}
+    PRIVATE mylib)
+
+    target_link_libraries(google_test_build
+    PRIVATE ${GTEST_LIBRARIES})
+
+    target_include_directories(google_test_build
+    PUBLIC ${PROJECT_BINARY_DIR})
+
+    add_test(google_test_version google_test_version)
+    add_test(google_test_build google_test_build)
+
+    enable_testing()
+#
+#
 endif()
 
 if (MSVC)
